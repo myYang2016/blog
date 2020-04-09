@@ -1,0 +1,159 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta http-equiv="X-UA-Compatible" content="ie=edge">
+  <title>Document</title>
+</head>
+
+<body>
+  <div>
+
+  </div>
+  <script>
+    // 频道号
+    const roomId = 439612;
+
+    // vioce：0 空：设置为观众 
+    // vioce：1 设置为主讲， 过滤讲师
+
+    setUsersVioce();
+
+    const preStatus = [];
+
+    async function setUsersVioce() {
+      const { code, data } = await getUserList() || {};
+      if (code !== 200) return console.error('请求在线列表接口失败');
+      const { count, userlist } = parseJson(data) || {};
+      for (let i = 0; i < userlist.length; i++) {
+        const { userId, classStatus: { voice } } = userlist[i];
+        if (
+          preStatus[userId] === undefined ||
+          (
+            parseInt(preStatus[userId]) === 1 &&
+            parseInt(voice) === 0
+          )
+        ) {
+          toSet(userId);
+          await delay(200);
+        }
+        preStatus[userId] = voice;
+      }
+    }
+
+    function toSet(uid) {
+      return ajax({
+        url: 'http://api.agora.io/dev/v1/client/command',
+        data: {
+          appid: 'c3f4ba2fd4e24c6aa4d38d85c5ed25fa',
+          cname: roomId,
+          uid,
+          mute_type: ["audio", "video"],
+        },
+        type: 'post',
+      })
+    }
+
+    async function getUserList() {
+      const sessionId = await getSessionId();
+      if (!sessionId) return console.error(`sessionId请求失败`);
+      return ajax({
+        url: 'http://apichat.polyv.net/front/listUsers',
+        data: {
+          roomId,
+          getStatus: 1,
+          sessionId,
+          page: 1,
+          len: 100,
+        },
+        type: 'get',
+      });
+    }
+
+    function getSessionId() {
+      return ajax({
+        url: 'http://api.polyv.net/live/channel-sessionid/query',
+        data: {
+          channelId: roomId
+        },
+        type: 'get',
+      }).then(result => {
+        const { code, data } = result || {};
+        if (code !== 200) {
+          console.error('请求sessionid失败');
+          return '';
+        }
+        return data;
+      });
+    }
+
+    function ajax({ url, data = null, type = 'get' } = {}) {
+      const xhr = new XMLHttpRequest();
+      const getUrl = (u, d) => {
+        if (!d) return u;
+        Object.keys(d).forEach((key) => {
+          const f = u.indexOf('?') === -1 ? '?' : '&';
+          let val = d[key];
+          if (val instanceof Object) val = JSON.stringify(val);
+          u += `${f}${encodeURIComponent(key)}=${encodeURIComponent(val)}`;
+        });
+        return u;
+      };
+      type = type.toLocaleLowerCase();
+      if (type === 'get') {
+        url = getUrl(url, data);
+        data = null;
+      } else {
+        const formData = new FormData();
+        if (typeof data === 'object')
+          Object.keys(data).forEach((key) => {
+            formData.append(key, data[key]);
+          });
+        data = formData;
+      }
+      return new Promise((resolve, reject) => {
+        xhr.onreadystatechange = () => {
+          if (xhr.readyState === 4)
+            if ((xhr.status >= 200 && xhr.status < 300) || xhr.status === 304) {
+              resolve({ status: true, code: xhr.status, data: xhr.responseText });
+            } else {
+              reject(new Error({ status: false, code: xhr.status }));
+            }
+        };
+        xhr.open(type, url, true);
+        xhr.send(data);
+      }).catch(err => console.warn(`发送图片出错，接口信息：${url}`));
+    }
+
+    function getUrl(url, data) {
+      if (!data) {
+        return url;
+      }
+      Object.keys(data).forEach((key) => {
+        const f = url.indexOf('?') === -1 ? '?' : '&';
+        let val = data[key];
+        if (val instanceof Object) {
+          val = JSON.stringify(val);
+        }
+        url += `${f}${encodeURIComponent(key)}=${encodeURIComponent(val)}`;
+      });
+      return url;
+    }
+
+    function parseJson(str) {
+      try {
+        return JSON.parse(str);
+      } catch (err) {
+        return false;
+      }
+    }
+
+    function delay(time) {
+      return new Promise(resolve => setTimeout(resolve, time));
+    }
+  </script>
+</body>
+
+</html>

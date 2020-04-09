@@ -1,0 +1,70 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta http-equiv="X-UA-Compatible" content="ie=edge">
+  <title>Document</title>
+  <style>
+    body{
+      margin:0;
+    }
+  </style>
+</head>
+
+<body>
+  <canvas id="myCanvas"></canvas>
+  <script>
+    window.onload = function () {
+      const c = document.querySelector('#myCanvas');
+      const ctx = c.getContext('2d');
+      const len = 14;
+      const angles = [Math.PI / 2, 0, 1.5 * Math.PI, Math.PI];
+      const width = document.documentElement.clientWidth;
+      const height = document.documentElement.clientHeight;
+      c.width = width;
+      c.height = height;
+      ctx.translate(width/2, height/2);
+      let f;
+      let s;
+      for (let i = 0; i < len; i++) {
+        let v;
+        if (i === 0 || i === 1) {
+          v = f = s = 1;
+        } else {
+          v = s + f;
+          f = s;
+          s = v;
+        }
+        const n = i % 4;
+        const a = angles[n];
+        if (i > 0) {
+          const dif = s - f;
+          switch (n) {
+            case 0:
+              ctx.translate(dif, 0);
+              break;
+            case 1:
+              ctx.translate(0, -dif);
+              break;
+            case 2:
+              ctx.translate(-dif, 0);
+              break;
+            case 3:
+              ctx.translate(0, dif);
+              break;
+          }
+        }
+        draw({ r: v, start: a, end: n === 2 ? 0 : (a + Math.PI / 2) });
+      }
+      function draw({ r, start, end }) {
+        ctx.beginPath();
+        ctx.arc(0, 0, r, start, end);
+        ctx.stroke();
+      }
+    }
+  </script>
+</body>
+
+</html>
