@@ -12,6 +12,8 @@ html(lang='en')
         for link in myStyle
             link(type='text/css', href='#{link}', rel='stylesheet')
     body !{headContent}
+      div.footer
+        a(href="http://www.beian.miit.gov.cn") 粤ICP备18044554号
     for js in jsArr
         script(src='#{js}')
 
