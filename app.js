@@ -4,6 +4,7 @@ const bodyParser = require('body-parser');
 const path = require('path');
 const mongoose = require('mongoose');
 const cookieParser = require('cookie-parser');
+const http = require('http');
 
 const pageRouter = require('./pageRouter');
 const backendApi = require('./interface/backend');
@@ -46,7 +47,24 @@ app.use('/', express.static(path.join(__dirname + '/static')));
 app.use('/backend/', express.static(path.join(__dirname + '/backend/dist')));
 // demo
 app.use('/demo', express.static(path.join(__dirname + '/demo')));
-app.listen(process.env.PORT || 8100, err => {
+// 引用npm包
+app.use('/script', express.static(path.resolve(__dirname, 'node_modules')));
+
+const server = http.createServer(app);
+const io = require('socket.io')(server, {
+  path: '/test',
+});
+
+io.on('connect', socket => {
+  console.log(`socket conenct ${socket.id}`);
+
+  socket.on('message', (msg) => {
+    console.log(msg)
+    socket.broadcast.emit('message', msg);
+  });
+});
+
+server.listen(process.env.PORT || 8100, err => {
   if (err) throw err;
   console.log('server connect in http://localhost:' + process.env.PORT || 8100);
 });
