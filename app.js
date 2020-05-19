@@ -61,7 +61,9 @@ const serverHttps = https.createServer(options);
 const io = require('socket.io')(server, {
   path: '/test',
 });
-io.listen(serverHttps);
+io.listen(serverHttps, {
+  path: '/test',
+});
 
 io.on('connect', socket => {
   console.log(`socket conenct ${socket.id}`);
