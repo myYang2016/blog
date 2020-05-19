@@ -50,10 +50,16 @@ app.use('/demo', express.static(path.join(__dirname + '/demo')));
 // 引用npm包
 app.use('/script', express.static(path.resolve(__dirname, 'node_modules')));
 
+const options = {
+  key: fs.readFileSync(path.resolve(__dirname, './certificates/2_www.yxgweb.com.key')),
+  cert: fs.readFileSync(path.resolve(__dirname, './certificates/1_www.yxgweb.com_bundle.crt'))
+};
 const server = http.createServer(app);
+const serverHttps = https.createServer(options);
 const io = require('socket.io')(server, {
   path: '/test',
 });
+io.listen(serverHttps);
 
 io.on('connect', socket => {
   console.log(`socket conenct ${socket.id}`);
