@@ -16,7 +16,7 @@ window.addEventListener('load', async () => {
 });
 
 function initSocket() {
-  const socket = io.connect('/', {
+  const socket = io.connect('//www.yxgweb.com:8081/', {
     path: '/test',
     'transports': ['websocket'],
   });
