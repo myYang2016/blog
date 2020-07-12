@@ -52,7 +52,7 @@ router.post('/backend/login', (req, res) => {
   });
   if (checkResult.status === 'fail') return res.json(checkResult);
 
-  const uuidNamespace = uuidv3('http://www.yxgweb.com/backend', uuidv3.URL);
+  const uuidNamespace = uuidv3('https://www.yxgweb.com/backend', uuidv3.URL);
   const uuidForPassword = uuidv3(JSON.stringify(userData), uuidNamespace);
   const portPassword = uuidv3(JSON.stringify(data), uuidNamespace);
   if (uuidForPassword === portPassword) {
