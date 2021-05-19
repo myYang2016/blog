@@ -10,6 +10,7 @@ const fs = require('fs');
 
 const pageRouter = require('./pageRouter');
 const backendApi = require('./interface/backend');
+const testApi = require('./interface/testApi');
 
 //连接数据库
 const dbPort = process.env.NODE_ENV === 'development' ? 27017 : 21018;
@@ -43,6 +44,7 @@ app.use('*', (req, res, next) => {
 
 app.use(pageRouter);
 app.use(backendApi);
+app.use(testApi);
 // 静态资源
 app.use('/', express.static(path.join(__dirname + '/static')));
 // 管理后台

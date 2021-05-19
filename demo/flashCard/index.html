@@ -1,0 +1,190 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Flash Card</title>
+  <style>
+    body {
+      padding: 0;
+      margin: 0;
+    }
+
+    .flash-card {
+      font-size: 15px;
+      padding: .3rem;
+    }
+
+    .flash-card .flash-card-add {
+      position: fixed;
+      bottom: 0;
+      left: 0;
+      width: 100%;
+      height: 1rem;
+      background: greenyellow;
+      text-align: center;
+      line-height: 1rem;
+      color: #fff;
+      font-size: 25px;
+    }
+
+    .flash-card .flash-card-edit {
+      width: 100%;
+      height: 80%;
+      display: none;
+    }
+
+    .flash-card .flash-card-edit label {
+      display: block;
+    }
+
+    .flash-card .flash-card-edit .flash-card-edit__text {
+      width: 100%;
+      height: 1rem;
+      line-height: 1rem;
+      padding: .3rem;
+      box-sizing: border-box;
+    }
+
+    .flash-card .flash-card-edit .flash-card-edit__sub {
+      width: 2rem;
+      height: .6rem;
+      text-align: center;
+      position: absolute;
+      bottom: 30%;
+      left: 50%;
+      margin-left: -1rem;
+      background: blue;
+      line-height: .6rem;
+      color: #fff;
+    }
+  </style>
+</head>
+
+<body>
+  <div class="flash-card">
+    <div class="flash-card-add" id="flashCardAdd">+</div>
+    <div class="flash-card-edit" id="flashCardEdit">
+      <label>
+        问题：
+        <input type="text" class="flash-card-edit__text flash-card-edit__question" id="flashCardEditQuestion">
+      </label>
+      <br>
+      <label>
+        答案：
+        <input type="text" class="flash-card-edit__text flash-card-edit__answer" id="flashCardEditAnswer">
+      </label>
+      <div class="flash-card-edit__sub" id="flashCardEditSub">确定</div>
+    </div>
+  </div>
+</body>
+<script>
+  window.onload = function () {
+    fontSizeInit();
+    listenAddBut();
+    handleSubBtn();
+  };
+  // 移动端适配
+  function fontSizeInit() {
+    const d = document.documentElement;
+    const dw = d.clientWidth;
+    if (dw) {
+      // 设计图宽度为375px，remUnit为配置基准
+      d.style.fontSize = `${dw / 375 * 50}px`;
+    }
+  }
+
+  function listenAddBut() {
+    addHandler('#flashCardAdd', 'touchend', addFlash);
+  }
+
+  function handleSubBtn() {
+    addHandler('#flashCardEditSub', 'touchend', function () {
+      const $q = document.querySelector('#flashCardEditQuestion');
+      const $a = document.querySelector('#flashCardEditAnswer');
+      const question = $q.value;
+      const answer = $a.value;
+      if (!question || !answer) {
+        return;
+      }
+      
+    });
+  }
+
+  function getFlashList() {
+
+  }
+
+  function addFlash() {
+    show('flashCardEdit');
+  }
+
+  function addHandler(element, type, handler) {
+    const el = typeof element === 'string' ? document.querySelector(element) : element;
+    if (!el) {
+      console.warn(`调用addHandler时，元素不存在，element:${element},type:${type}`);
+      return false;
+    }
+    if (el.addEventListener) {
+      el.addEventListener(type, handler, false);
+    } else if (el.attachEvent) {
+      el.attachEvent(`on${type}`, handler);
+    } else {
+      el[`on${type}`] = handler;
+    }
+    return true;
+  }
+
+  function show(id, type = 'block') {
+    const dom = typeof id === 'string' ? document.getElementById(id) : id;
+    if (!dom) {
+      return;
+    }
+    if (!isShow(dom)) {
+      setStyle(dom, { display: type });
+    }
+  };
+
+  function isShow(id) {
+    if (!id) {
+      return true;
+    }
+    const dom = typeof id === 'string' ? document.getElementById(id) : id;
+    if (!dom) {
+      return false;
+    }
+    if (dom.style && dom.style.display) {
+      return dom.style.display === 'block';
+    }
+
+    return getComputedStyle(dom, null).display === 'block';
+  };
+
+  // 设置指定dom元素样式
+  function setStyle(el, option) {
+    el = typeof el === 'string' ? document.querySelector(el) : el;
+    if (!el) {
+      return;
+    }
+    let elStyle = (el.getAttribute('style') || '').trim();
+    if (elStyle) {
+      if (!(elStyle.match(/;$/))) {
+        elStyle += ';';
+      }
+      elStyle = elStyle.match(/[^:;]*:[^:;]*;/g).map(s => s.trim().replace(/:\s?/, ':')).join('');
+    }
+    Object.keys(option).forEach((key) => {
+      const val = option[key];
+      const reg = new RegExp(`${key}:[^:]*;`);
+      const mat = elStyle.match(reg);
+      const newStyle = `${key}:${val};`;
+      mat
+        ? (elStyle = elStyle.replace(reg, newStyle))
+        : (elStyle += newStyle);
+    });
+    el.setAttribute('style', elStyle);
+  }
+</script>
+
+</html>
