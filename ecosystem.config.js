@@ -7,11 +7,11 @@ module.exports = {
     watch: true,
     env: {
       'NODE_ENV': 'development',
-      'PORT': 8100,
+      'PORT': 8080,
     },
     env_production: {
       'NODE_ENV': 'production',
-      'PORT': 80,
+      'PORT': 8080,
     }
   }]
 };
