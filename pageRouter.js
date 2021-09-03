@@ -50,8 +50,8 @@ module.exports = router;
 
 function getIP(req) {
   return (req.headers && (req.headers['x-real-ip'] || req.headers['x-forwarded-for'])) ||
-    req.connection.remoteAddress ||
-    req.socket.remoteAddress ||
-    req.connection.socket.remoteAddress ||
+    req.connection?.remoteAddress ||
+    req.socket?.remoteAddress ||
+    req.connection?.socket?.remoteAddress ||
     req.ip;
 }

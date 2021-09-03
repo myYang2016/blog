@@ -76,9 +76,10 @@ io.on('connect', socket => {
   });
 });
 
-server.listen(process.env.PORT || 8100, err => {
+const port = process.env.PORT || 8100;
+server.listen(port, err => {
   if (err) throw err;
-  console.log('server connect in http://localhost:' + process.env.PORT || 8100);
+  console.log('server connect in http://localhost:' + port);
 });
 
-serverHttps.listen(parseInt(process.env.PORT || 8100)+1);
+serverHttps.listen(parseInt(port)+1);
